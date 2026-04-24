@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-import pickle
+from django.conf import settings
+import joblib
 import pandas as pd
 from .forms import CropYieldForm
 
@@ -17,10 +18,8 @@ def predict_yield(request):
             rainfall = form.cleaned_data['rainfall']
             crop = form.cleaned_data['crop']
 
-            with open('model/crop_model.pkl', 'rb') as file:
-                model = pickle.load(file)
-            with open('model/label_encoder.pkl', 'rb') as file:
-                le = pickle.load(file)
+            model = joblib.load(settings.BASE_DIR / 'model' / 'crop_model.joblib')
+            le = joblib.load(settings.BASE_DIR / 'model' / 'label_encoder.joblib')
 
             crop_encoded = le.transform([crop])[0]
             input_data = pd.DataFrame(
